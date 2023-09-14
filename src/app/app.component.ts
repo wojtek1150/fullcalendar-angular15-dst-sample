@@ -30,6 +30,7 @@ export class AppComponent {
   calendarVisible$ = this.store.select(CalendarFeature.selectCalendarVisible)
   events$ = this.store.select(CalendarFeature.selectEvents)
   eventsCount$ = this.store.select(selectEventsCount)
+  mapper =  true;
 
   constructor(private readonly store: Store) {
   }
@@ -65,5 +66,9 @@ export class AppComponent {
     if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
       this.store.dispatch(CalendarActions.deleteEvent({id: clickInfo.event.id}))
     }
+  }
+
+  handleMapperChange() {
+
   }
 }

@@ -5,7 +5,6 @@ import {RRule, RRuleSet, rrulestr} from 'rrule'
 let eventGuid = 0
 const TODAY_STR = new Date().toISOString().replace(/T.*$/, '') // YYYY-MM-DD of today
 
-
 // Ustal datę początkową i godzinę wydarzenia w czasie UTC
 const startDateUTC = DateTime.fromObject({
   year: 2023,
@@ -52,7 +51,7 @@ export const INITIAL_EVENTS: EventInput[] = [
   },
   {
     id: createEventId(),
-    title: 'November - May 11-13 UTC',
+    title: 'November - May 12-13 UTC',
     start: '2023-11-05T12:00:00.000Z',
     end: '2023-11-05T13:00:00.000Z',
     rrule: 'FREQ=WEEKLY;BYDAY=MO;UNTIL=20240520T215959Z',
@@ -89,32 +88,31 @@ export const INITIAL_EVENTS: EventInput[] = [
   // To create event only rrule is needed
   return newItem;
 })
-  .map(item => {
-    // Here goes DST mapper....
-
-    // 1st move current dates into current tz
-    const movedStart = new Date(item.start);
-    const movedEnd = new Date(item.end);
-    movedStart.setMinutes(movedStart.getMinutes() - movedStart.getTimezoneOffset())
-    movedEnd.setMinutes(movedEnd.getMinutes() - movedEnd.getTimezoneOffset())
-
-    // 2nd Setup slot duration time
-    const duration = new Date(movedEnd).getTime() - movedStart.getTime();
-
-    // Create rule, magic here is add timezone id for the user timezone from luxon
-    const ruleSet = new RRuleSet();
-    ruleSet.rrule(rrulestr(item.rrule, {dtstart: movedStart, tzid: DateTime.now().toFormat('z')}));
-    const newItem = {
-      ...item,
-      rrule: ruleSet.toString(),
-      duration,
-      movedStart: movedStart.toISOString(),
-      movedEnd: movedEnd.toISOString(),
-    }
-    console.log('after mapping:', newItem);
-    return newItem;
-
-  })
+  // .map(item => {
+  //   // Here goes DST mapper....
+  //
+  //   // 1st move current dates into current tz
+  //   const movedStart = new Date(item.start);
+  //   const movedEnd = new Date(item.end);
+  //   movedStart.setMinutes(movedStart.getMinutes() - movedStart.getTimezoneOffset())
+  //   movedEnd.setMinutes(movedEnd.getMinutes() - movedEnd.getTimezoneOffset())
+  //
+  //   // 2nd Setup slot duration time
+  //   const duration = new Date(movedEnd).getTime() - movedStart.getTime();
+  //
+  //   // Create rule, magic here is add timezone id for the user timezone from luxon
+  //   const ruleSet = new RRuleSet();
+  //   ruleSet.rrule(rrulestr(item.rrule, {dtstart: movedStart, tzid: DateTime.now().toFormat('z')}));
+  //   const newItem = {
+  //     ...item,
+  //     rrule: ruleSet.toString(),
+  //     duration,
+  //     movedStart: movedStart.toISOString(),
+  //     movedEnd: movedEnd.toISOString(),
+  //   }
+  //   console.log('after mapping:', newItem);
+  //   return newItem;
+  // })
 
 export function createEventId() {
   return String(eventGuid++)
