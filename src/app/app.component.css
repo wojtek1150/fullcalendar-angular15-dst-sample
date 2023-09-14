@@ -45,3 +45,7 @@ b { /* used for event dates/times */
   max-width: 1100px;
   margin: 0 auto;
 }
+
+:host ::ng-deep .fc .fc-timegrid-slot {
+  height: 3em;
+}

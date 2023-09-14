@@ -1,16 +1,14 @@
-import { Component } from '@angular/core'
-import { Store } from '@ngrx/store'
-import { CalendarOptions, DateSelectArg, EventClickArg, EventInput } from '@fullcalendar/core'
+import {Component} from '@angular/core'
+import {Store} from '@ngrx/store'
+import {CalendarOptions, DateSelectArg, EventClickArg, EventInput} from '@fullcalendar/core'
 import interactionPlugin from '@fullcalendar/interaction'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import listPlugin from '@fullcalendar/list'
 import rrulePlugin from '@fullcalendar/rrule'
-import { createEventId, INITIAL_EVENTS } from './event-utils'
-import { CalendarFeature, selectEventsCount } from './reducer'
+import {createEventId} from './event-utils'
+import {CalendarFeature, selectEventsCount} from './reducer'
 import * as CalendarActions from './actions'
-import { datetime, Frequency, RRule, rrulestr } from 'rrule'
-import { DateTime } from 'luxon'
 
 @Component({
   selector: 'app-root',
@@ -18,32 +16,15 @@ import { DateTime } from 'luxon'
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  viewStartTime = '08:00:00'
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin, rrulePlugin],
     initialView: 'timeGridWeek',
     firstDay: 0,
-    weekends: true,
-    editable: false,
-    dayMaxEventRows: true,
-    selectable: false,
-    longPressDelay: 0,
-    select: this.handleDateSelect.bind(this),
-    eventClick: this.handleEventClick.bind(this), nowIndicator: true,
-    scrollTime: this.viewStartTime,
-    slotDuration: { minutes: 30 },
-    slotLabelFormat: {
-      hour: 'numeric',
-      minute: '2-digit'
-    },
-    eventTimeFormat: {
-      hour: 'numeric',
-      minute: '2-digit',
-      omitZeroMinute: false
-    },
-    events: INITIAL_EVENTS,
+    weekends: false,
+    slotDuration: {minutes: 60},
     height: '100%',
-    allDaySlot: false
+    select: this.handleDateSelect.bind(this),
+    eventClick: this.handleEventClick.bind(this),
   }
 
   calendarVisible$ = this.store.select(CalendarFeature.selectCalendarVisible)
@@ -51,15 +32,6 @@ export class AppComponent {
   eventsCount$ = this.store.select(selectEventsCount)
 
   constructor(private readonly store: Store) {
-    const rule = new RRule({
-      dtstart: datetime(2023, 9, 17, 17, 0),
-      count: 20,
-      freq: Frequency.WEEKLY
-    })
-    console.log(rule.all())
-    console.log(rule.toString())
-    console.log(rrulestr('DTSTART:20230911T170000\nRRULE:FREQ=WEEKLY;UNTIL=20231231;BYDAY=FR').all())
-    console.log(rrulestr('DTSTART:20230911T170000Z\nRRULE:FREQ=WEEKLY;UNTIL=20231231;BYDAY=MO').all())
   }
 
   handleCalendarToggle() {
@@ -67,7 +39,7 @@ export class AppComponent {
   }
 
   handleWeekendsToggle() {
-    const { calendarOptions } = this
+    const {calendarOptions} = this
     calendarOptions.weekends = !calendarOptions.weekends
   }
 
@@ -85,13 +57,13 @@ export class AppComponent {
         end: selectInfo.endStr,
         allDay: selectInfo.allDay
       }
-      this.store.dispatch(CalendarActions.createEvent({ event }))
+      this.store.dispatch(CalendarActions.createEvent({event}))
     }
   }
 
   handleEventClick(clickInfo: EventClickArg) {
     if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-      this.store.dispatch(CalendarActions.deleteEvent({ id: clickInfo.event.id }))
+      this.store.dispatch(CalendarActions.deleteEvent({id: clickInfo.event.id}))
     }
   }
 }
