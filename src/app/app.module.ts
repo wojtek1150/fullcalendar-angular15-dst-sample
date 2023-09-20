@@ -4,7 +4,8 @@ import {FullCalendarModule} from '@fullcalendar/angular';
 import {AppComponent} from './app.component';
 import {StoreModule} from '@ngrx/store';
 import {CalendarFeature} from './reducer';
-import {MapperPipe} from "./mapper.pipe";
+import {HttpClientModule} from "@angular/common/http";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -13,7 +14,9 @@ import {MapperPipe} from "./mapper.pipe";
   imports: [
     BrowserModule,
     FullCalendarModule,
-    MapperPipe,
+    HttpClientModule,
+    ReactiveFormsModule,
+    FormsModule,
     StoreModule.forRoot(),
     StoreModule.forFeature(CalendarFeature)
   ],

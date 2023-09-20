@@ -2,58 +2,28 @@
 
   <div class='demo-app-sidebar'>
     <div class='demo-app-sidebar-section'>
-      <label>
-        <input
-          type='checkbox'
-          [checked]='calendarVisible$ | async'
-          (change)='handleCalendarToggle()'
-        />
-        toggle whole calendar
-      </label>
-    </div>
-    <div class='demo-app-sidebar-section'>
-      <label>
-        <input
-          type='checkbox'
-          [checked]='calendarOptions.weekends'
-          (change)='handleWeekendsToggle()'
-        />
-        toggle weekends
-      </label>
-    </div>
-    <div class='demo-app-sidebar-section'>
-      <label>
-        <input
-          type='checkbox'
-          [checked]='mapper'
-          (change)='mapper = !mapper'
-        />
-        toogle mapper
-      </label>
-      <p>Mapper will convert current time to local time in user zone in may then display with "tzid" property set</p>
-    </div>
-    <div class='demo-app-sidebar-section'>
-      <h2>All Events ({{(eventsCount$ | async)}})</h2>
+      <h2>All Events before mapping({{(eventsCount$ | async)}})</h2>
       <ul>
-        <li *ngFor='let event of (events$ | async) | mapper: mapper'>
-          <b>{{event.start}}</b>
-          <i>{{event.title}}</i>
+        <li *ngFor='let event of (events$ | async)' [style.background]="event.color">
+          <h4>{{event.title}}</h4>
+          <p>Start w bazie: {{event.start}}</p>
+          <p>RR w bazie: {{event['recurrenceRule']}}</p>
         </li>
       </ul>
     </div>
   </div>
 
   <div class='demo-app-main'>
-    <full-calendar
-      *ngIf='calendarVisible$ | async'
-      [options]='calendarOptions'
-      [events]="(events$ | async) | mapper: mapper"
-    >
+
+    <div class="zone">
+      <p>Current timezone {{selectedZone}}</p>
+      <p>To change timezone go to chrome devtools settings -> more -> sensors -> override location -> reload page</p>
+    </div>
+    <full-calendar *ngIf='calendarVisible$ | async' [options]='calendarOptions'>
       <ng-template #eventContent let-arg>
-        <b>{{ arg.timeText }}</b>
         <i>{{ arg.event.title }}</i>
+        <b>{{ arg.timeText }}</b>
       </ng-template>
     </full-calendar>
   </div>
-
 </div>
