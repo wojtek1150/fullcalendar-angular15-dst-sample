@@ -42,12 +42,16 @@ export const INITIAL_EVENTS: EventInput[] = [
   },
   {
     id: createEventId(),
-    title: '5# SR: 10-11 zona Warsaw format UTC (AUG-DEC)',
+    title: '5# SR: 10-11 zona Warsaw format UTC (AUG-DEC) ze SKIP DATES',
     start: '2023-08-01T08:00:00.000Z',
     end: '2023-08-01T09:00:00.000Z',
     recurrenceRule: 'FREQ=WEEKLY;BYDAY=WE;UNTIL=20231231T215959Z',
     tzid: 'Europe/Warsaw',
-    color: '#2ECC71'
+    color: '#2ECC71',
+    skipDates: [
+      '2023-08-23T08:00:00.000Z',
+      '2023-09-20T08:00:00.000Z'
+    ]
   },
   {
     id: createEventId(),
@@ -87,10 +91,10 @@ export const INITIAL_EVENTS: EventInput[] = [
   },
   {
     id: createEventId(),
-    title: '10# PT: 16-17 zona Warsaw format UTC (CZ-MAJ)',
-    start: '2023-06-05T14:00:00.000Z',
-    end: '2023-06-05T15:00:00.000Z',
-    recurrenceRule: 'FREQ=WEEKLY;BYDAY=FR;UNTIL=20240520T215959Z',
+    title: '10# PT: 9-10 zona Warsaw format UTC (WRZx5)',
+    start: '2023-09-14T07:00:00.000Z',
+    end: '2023-09-14T08:00:00.000Z',
+    recurrenceRule: 'FREQ=WEEKLY;BYDAY=FR;COUNT=5',
     tzid: 'Europe/Warsaw',
     color: '#E67E22'
   },

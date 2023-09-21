@@ -56,22 +56,53 @@ export class AppComponent implements OnInit {
 
   private mapEvents(events: any, zone: string): EventInput[] {
     const newEvents = (events as any[]).map(item => {
-      // 1st move event dates into current timezone
+      // move event dates into current timezone
       const movedStart = DateTime.fromISO(item.start, {zone: item.tzid})
       const movedEnd = DateTime.fromISO(item.end, {zone: item.tzid})
 
-      // 2nd Setup slot duration time
+      // Setup slot duration time
       const duration = new Date(movedEnd.toJSDate()).getTime() - movedStart.toJSDate().getTime();
 
-      const rrule = `DTSTART;TZID=${item.tzid}:${movedStart.toFormat('yyyymmdd')}T${movedStart.toFormat('HHmmss')}\nRRULE:${item.recurrenceRule.replace('Z','')}`
+      // Assign default rrule (this covers count property)
+      let rrule = item.recurrenceRule.includes('INTERVAL') ? item.recurrenceRule.slice(0, -11) : item.recurrenceRule;
+
+      // Parse until date if exist
+      if (item.recurrenceRule.includes('UNTIL')) {
+        const untilDate = DateTime.fromISO(item.recurrenceRule.slice(-16), {zone: item.tzid});
+        rrule = `${item.recurrenceRule.slice(0, -16)}${untilDate.toFormat('yyyyLLdd')}T${untilDate.toFormat('HHmmss')}`
+      }
+
+
+      // Merge all rule string params
+      let ruleString = `DTSTART;TZID=${item.tzid}:${movedStart.toFormat('yyyyLLdd')}T${movedStart.toFormat('HHmmss')}\nRRULE:${rrule}`
+
       const ruleSet = new RRuleSet();
-      ruleSet.rrule(rrulestr(item.recurrenceRule, {dtstart: movedStart.toJSDate(), tzid: item.tzid}));
+      ruleSet.rrule(rrulestr(ruleString));
+
+      // Check skipped dates
+      if (item.skipDates?.length) {
+        // "DTSTART;TZID=Europe/Warsaw:20230801T100000
+        // RRULE:FREQ=WEEKLY;BYDAY=WE;UNTIL=20231231T225959
+        // EXDATE;TZID=Europe/Warsaw:20230823T080000,20230920T080000"
+
+        const exdates = item.skipDates.map((isoString: string) => {
+          const luxonDate = DateTime.fromISO(isoString, {zone: item.tzid});
+          return `${luxonDate.toFormat('yyyyLLdd')}T${luxonDate.toFormat('HHmmss')}`;
+        });
+        ruleString += `\nEXDATE;TZID=${item.tzid}:${exdates.join(',')}`;
+      }
+
+      if (ruleString.includes('COUNT')) {
+        ruleString += ';UNTIL=23232006T100000';
+      }
+
       return {
         recurrenceRule: item.recurrenceRule,
         title: item.title,
         color: item.color,
-        rrule,
-        ruleSetString: ruleSet.toString(),
+        rrule: ruleString,
+        ruleSet: ruleSet.toString(),
+        all: ruleSet.all(),
         duration,
         movedStart: movedStart.toString(),
         movedEnd: movedEnd.toString(),
