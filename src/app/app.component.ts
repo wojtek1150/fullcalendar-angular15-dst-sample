@@ -63,10 +63,11 @@ export class AppComponent implements OnInit {
       // Setup slot duration time
       const duration = new Date(movedEnd.toJSDate()).getTime() - movedStart.toJSDate().getTime();
 
-      // Assign default rrule (this covers count property)
+      // Create default rrule - remove last 11 characters when interval set (INTERVAL=1)
       let rrule = item.recurrenceRule.includes('INTERVAL') ? item.recurrenceRule.slice(0, -11) : item.recurrenceRule;
 
       // Parse until date if exist
+      // 16 is number of characters in ISO formatted DATE like 20230801T100000Z
       if (item.recurrenceRule.includes('UNTIL')) {
         const untilDate = DateTime.fromISO(item.recurrenceRule.slice(-16), {zone: item.tzid});
         rrule = `${item.recurrenceRule.slice(0, -16)}${untilDate.toFormat('yyyyLLdd')}T${untilDate.toFormat('HHmmss')}`
@@ -79,6 +80,11 @@ export class AppComponent implements OnInit {
       const ruleSet = new RRuleSet();
       ruleSet.rrule(rrulestr(ruleString));
 
+      // Handle count with local date
+      if (ruleString.includes('COUNT')) {
+        ruleString += ';UNTIL=23232006T100000';
+      }
+
       // Check skipped dates
       if (item.skipDates?.length) {
         // "DTSTART;TZID=Europe/Warsaw:20230801T100000
@@ -90,10 +96,6 @@ export class AppComponent implements OnInit {
           return `${luxonDate.toFormat('yyyyLLdd')}T${luxonDate.toFormat('HHmmss')}`;
         });
         ruleString += `\nEXDATE;TZID=${item.tzid}:${exdates.join(',')}`;
-      }
-
-      if (ruleString.includes('COUNT')) {
-        ruleString += ';UNTIL=23232006T100000';
       }
 
       return {
